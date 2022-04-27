@@ -1,0 +1,25 @@
+version: '3'
+services:
+  api:
+    build: .
+    environment:
+      PORT: 8080
+    ports:
+      - "8081:8080"
+  mysql:
+    image: mariadb:10.5
+    #restart: unless-stopped
+    volumes:
+      #- ./sql/init:/docker-entrypoint-initdb.d
+      - ./sql/var/db:/var/lib/mysql
+    environment:
+      - MYSQL_USER=devadmin
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3308:3306"
+    healthcheck:
+      # Checking the exit code, not stdout.
+      test: mysql --user=root --password=root --execute="SELECT healthy FROM util.healthcheck" --host=mysql-local --port=3306 --skip-column-names --silent | grep OK
+      interval: 1s
+      retries: 30
+      timeout: 500ms
