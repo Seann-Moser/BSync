@@ -14,7 +14,7 @@ var songsCmd = &cobra.Command{
 }
 
 func songsInit() {
-	songsCmd.Flags().StringP("beat-sync-url", "u", "https://bsaber.com/songs/top/?time=7-days", "")
+	songsCmd.Flags().StringP("beat-sync-url", "b", "https://bsaber.com/songs/top/?time=7-days", "")
 	viper.BindPFlags(songsCmd.Flags())
 	RootCmd.AddCommand(songsCmd)
 }
