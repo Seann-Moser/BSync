@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/apex/log"
+	"github.com/inconshreveable/mousetrap"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -26,9 +27,11 @@ I want to create lovely CLI program with this framework :)
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+	if mousetrap.StartedByExplorer() {
+		UserInput()
+	} else if err := RootCmd.Execute(); err != nil {
+		log.Error(err.Error())
+		os.Exit(1)
 	}
 }
 
@@ -53,7 +56,7 @@ func init() {
 	// when this action is called directly.
 	songsInit()
 	songsSearchInit()
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 	viper.BindPFlags(RootCmd.PersistentFlags())
 }
 
