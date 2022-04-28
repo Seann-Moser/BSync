@@ -13,6 +13,7 @@ type SongEndpoint struct {
 	Amount           int      `json:"amount"`
 	MinRating        float32  `json:"min_rating"`
 	DifficultyLevels []string `json:"difficulty_levels"`
+	Type             string   `json:"type"`
 }
 
 func (s *SongEndpoint) Process(conf configuration.Config) error {
@@ -39,6 +40,7 @@ func LoadSongEndpoints(conf *configuration.Config) ([]*SongEndpoint, error) {
 	err = ioutil.WriteFile(conf.SongConfigName, file, 0644)
 	return output, err
 }
+
 func setDefault(conf *configuration.Config) []*SongEndpoint {
 	return []*SongEndpoint{
 		{
@@ -46,24 +48,28 @@ func setDefault(conf *configuration.Config) []*SongEndpoint {
 			Amount:           -1, // Downloads all bookmarked songs
 			MinRating:        0.0,
 			DifficultyLevels: nil,
+			Type:             "Replace",
 		},
 		{
 			Url:              "https://bsaber.com/songs/top/?time=30-days",
 			Amount:           40,
 			MinRating:        0.5,
 			DifficultyLevels: nil,
+			Type:             "Append",
 		},
 		{
 			Url:              "https://bsaber.com/songs/top/?time=7-days",
 			Amount:           20,
 			MinRating:        0.5,
 			DifficultyLevels: nil,
+			Type:             "Append",
 		},
 		{
 			Url:              "https://bsaber.com/songs/curated/?recommended=true",
 			Amount:           20,
 			MinRating:        0.5,
 			DifficultyLevels: nil,
+			Type:             "Append",
 		},
 	}
 }
