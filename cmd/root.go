@@ -45,9 +45,13 @@ func init() {
 	RootCmd.PersistentFlags().Bool("logging-prod", true, "")
 	RootCmd.PersistentFlags().StringP("logging-level", "l", "info", "")
 	RootCmd.PersistentFlags().StringP("beat-saber-path", "p", "C:/Program Files (x86)/Steam/steamapps/common/Beat Saber/Beat Saber_Data/CustomLevels/", "")
-
+	RootCmd.PersistentFlags().Float32P("min-rating-percent", "r", .5, "")
+	RootCmd.PersistentFlags().IntP("workers", "w", 4, "")
+	RootCmd.PersistentFlags().IntP("download-delay", "d", 5, "")
+	RootCmd.PersistentFlags().IntP("song-download-amount", "a", 20, "")
 	// when this action is called directly.
 	songsInit()
+	songsSearchInit()
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	viper.BindPFlags(RootCmd.PersistentFlags())
 }

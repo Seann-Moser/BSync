@@ -13,9 +13,13 @@ type Config struct {
 	BSaberURL    string `mapstructure:"beat-sync-url"`
 	Workers      int    `mapstructure:"workers"`
 
+	Search string `json:"search"`
+
 	SongDownloadAmount int    `mapstructure:"song-download-amount"`
 	BeatSaberPath      string `mapstructure:"beat-saber-path"`
 	DownloadDelay      int    `mapstructure:"download-delay"`
+
+	MinRatingPercent float32 `mapstructure:"min-rating-percent"`
 }
 
 func LoadConfig() (*Config, error) {
