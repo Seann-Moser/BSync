@@ -1,24 +1,9 @@
 package main
 
 import (
-	"github.com/Seann-Moser/BaseGoAPI/internal/server"
-	"log"
-	"os"
-
-	"github.com/urfave/cli/v2"
+	"github.com/Seann-Moser/BSync/cmd"
 )
 
 func main() {
-	var (
-		err error
-		app = &cli.App{
-			Name:   "",
-			Usage:  "",
-			Action: server.Serve,
-		}
-	)
-
-	if err = app.Run(os.Args); err != nil {
-		log.Println("exiting with error:", err.Error())
-	}
+	cmd.Execute()
 }
