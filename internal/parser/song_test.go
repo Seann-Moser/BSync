@@ -14,7 +14,7 @@ func TestSongParser_GetSongs(t *testing.T) {
 	//https://bsaber.com/songs/top/?time=30-days
 	//https://bsaber.com/songs/top/?time=7-days
 	parser := NewSongParser(logger)
-	_, err = parser.GetSongsWithPage("https://bsaber.com/songs/new/?bookmarked_by=Nines", 25, 0.5, "")
+	_, err = parser.GetSongsWithPage("https://bsaber.com/songs/curated/?recommended=true", 25, 0.5, "")
 	if err != nil {
 		t.Fatal(err)
 	}

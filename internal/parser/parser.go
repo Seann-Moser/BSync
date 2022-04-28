@@ -116,7 +116,7 @@ func (s *SongParser) GetSongsWithPage(u string, amount int, minRating float32, p
 		}
 
 		songList = append(songList, sl...)
-		if len(songList) > amount {
+		if len(songList) > amount && amount != -1 {
 			return songList[:amount], nil
 		}
 
