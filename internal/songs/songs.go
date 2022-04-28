@@ -14,10 +14,9 @@ func Runner(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 	songParser := parser.NewSongParser(config.Logger)
-	songs, err := songParser.GetSongsWithPage(config.BSaberURL, config.SongDownloadAmount, config.MinRatingPercent)
+	err = songParser.DownloadSongs(config.BSaberURL, config)
 	if err != nil {
 		config.Logger.Fatal("failed getting songs from page:"+config.BSaberURL, zap.Error(err))
 	}
-	songParser.DownloadSongList(songs, config.Workers, config.BeatSaberPath)
 
 }

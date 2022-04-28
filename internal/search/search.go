@@ -1,7 +1,6 @@
 package search
 
 import (
-	"fmt"
 	"github.com/Seann-Moser/BSync/internal/configuration"
 	"github.com/Seann-Moser/BSync/internal/parser"
 	"github.com/spf13/cobra"
@@ -16,11 +15,12 @@ func Runner(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 	songParser := parser.NewSongParser(config.Logger)
-	u := "https://bsaber.com/?s=" + strings.ReplaceAll(config.Search, " ", "+")
-	songs, err := songParser.GetSongsWithPage(u, config.SongDownloadAmount, config.MinRatingPercent)
+	searchURL := "https://bsaber.com/?s=" + strings.ReplaceAll(config.Search, " ", "+")
+	if config.Search == "" && config.UserName != "" {
+		searchURL = "https://bsaber.com/songs/new/?bookmarked_by=" + config.UserName
+	}
+	err = songParser.DownloadSongs(searchURL, config)
 	if err != nil {
 		config.Logger.Fatal("failed getting songs from page:"+config.BSaberURL, zap.Error(err))
 	}
-	config.Logger.Info(fmt.Sprintf("found %d songs for this search", len(songs)))
-	songParser.DownloadSongList(songs, config.Workers, config.BeatSaberPath)
 }

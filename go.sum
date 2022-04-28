@@ -46,6 +46,8 @@ github.com/Seann-Moser/WebParser v1.0.6 h1:jr8lw+FU/hy3yFeAD9tvX47RX1aAgQt+8iIYS
 github.com/Seann-Moser/WebParser v1.0.6/go.mod h1:GzFd1fdKnJ+JNHFC15G2AxECJwXPv2PW/6d2m84yBE0=
 github.com/Seann-Moser/WebParser v1.0.7 h1:IL0GEapOEn2420dvl+KeFY0SeVBP3QZuY2KGvfroKYQ=
 github.com/Seann-Moser/WebParser v1.0.7/go.mod h1:GzFd1fdKnJ+JNHFC15G2AxECJwXPv2PW/6d2m84yBE0=
+github.com/Seann-Moser/WebParser v1.0.8 h1:L7AoZ9ZnP84m4K+N9g7MFiVNk5WX6vS2Wqk2oRlfSYg=
+github.com/Seann-Moser/WebParser v1.0.8/go.mod h1:GzFd1fdKnJ+JNHFC15G2AxECJwXPv2PW/6d2m84yBE0=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

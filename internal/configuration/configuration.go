@@ -13,8 +13,8 @@ type Config struct {
 	BSaberURL    string `mapstructure:"beat-sync-url"`
 	Workers      int    `mapstructure:"workers"`
 
-	Search string `json:"search"`
-
+	Search             string `json:"search" mapstructure:"search"`
+	UserName           string `json:"user_name" mapstructure:"user_name"`
 	SongDownloadAmount int    `mapstructure:"song-download-amount"`
 	BeatSaberPath      string `mapstructure:"beat-saber-path"`
 	DownloadDelay      int    `mapstructure:"download-delay"`

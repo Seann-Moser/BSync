@@ -49,6 +49,7 @@ func init() {
 	RootCmd.PersistentFlags().IntP("workers", "w", 4, "")
 	RootCmd.PersistentFlags().IntP("download-delay", "d", 5, "")
 	RootCmd.PersistentFlags().IntP("song-download-amount", "a", 20, "")
+	RootCmd.PersistentFlags().StringP("user_name", "u", "", "")
 	// when this action is called directly.
 	songsInit()
 	songsSearchInit()
