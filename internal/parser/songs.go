@@ -11,18 +11,78 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
 type Song struct {
-	ID           string `json:"id"`
-	Url          string `json:"song_url"`
-	Title        string `json:"title"`
-	Difficulties []string
-	Thumbnail    string `json:"thumbnail"`
-	DownloadLink string `json:"download_link"`
+	ID              string `json:"id"`
+	Url             string `json:"song_url"`
+	Title           string `json:"title"`
+	Difficulties    []string
+	Thumbnail       string `json:"thumbnail"`
+	DownloadLink    string `json:"download_link"`
+	RawDifficulties string `json:"raw_difficulties"`
+	RatingPercent   float32
+	RawText         string `json:"raw_text"`
+}
+
+func (s *Song) Process() {
+	s.GetID()
+	s.GetDownloadLink()
+	s.GetTitle()
+	s.ProcessRawText()
+}
+
+func (s *Song) ProcessRawText() {
+	if strings.Contains(s.RawText, "---") {
+		sp := strings.Split(s.RawText, "---")
+		titleIndex := -1
+		for i, v := range sp {
+			if strings.EqualFold(v, s.Title) {
+				titleIndex = i
+				break
+			}
+		}
+		if titleIndex == -1 {
+			return
+		}
+		difficultyIndex := titleIndex + 1
+		difficulties := sp[difficultyIndex:]
+		rating := []string{}
+		for i, d := range difficulties {
+			if _, err := strconv.Atoi(d); err == nil {
+				rating = sp[difficultyIndex+i : difficultyIndex+i+2]
+				break
+			} else if strings.EqualFold(d, "difficulties") {
+				continue
+			} else {
+				s.Difficulties = append(s.Difficulties, d)
+			}
+		}
+		thumbsUp, err := strconv.Atoi(rating[0])
+		if err != nil {
+
+		}
+		thumbsDown, err := strconv.Atoi(rating[1])
+		if err != nil {
+
+		}
+		if thumbsDown+thumbsUp > 0 {
+			p := float32(thumbsUp) / float32(thumbsUp+thumbsDown)
+			s.RatingPercent = p
+		}
+
+	}
+}
+
+func (s *Song) GetTitle() {
+	if strings.Contains(s.Title, ",") {
+		sp := strings.Split(s.Title, ",")
+		s.Title = sp[0]
+	}
 }
 
 func (s *Song) GetID() {
@@ -31,6 +91,7 @@ func (s *Song) GetID() {
 		s.ID = sp[len(sp)-2]
 	}
 }
+
 func (s *Song) GetDownloadLink() {
 	if s.ID == "" {
 		s.GetID()
@@ -164,13 +225,13 @@ func NewSongParser(logger *zap.Logger) *SongParser {
 		Data: []*website.Search{
 			{
 				Type:  website.TypeTag,
-				Tag:   "figure",
+				Tag:   "article",
 				Order: 0,
 			},
 			{
 				Type:     website.TypeAttribute,
 				Tag:      "class",
-				TagValue: "post-gallery",
+				TagValue: "post.*",
 				Order:    0,
 				Flatten:  true,
 			},
@@ -183,8 +244,22 @@ func NewSongParser(logger *zap.Logger) *SongParser {
 			},
 			{
 				Type:            website.TypeAttribute,
-				Tag:             "href",
+				Tag:             "link",
 				InternalTagName: "song_url",
+				Order:           0,
+				OnlyRemap:       true,
+			},
+			{
+				Type:            website.TypeAttribute,
+				Tag:             "href",
+				InternalTagName: "raw_difficulties",
+				Order:           0,
+				OnlyRemap:       true,
+			},
+			{
+				Type:            website.TypeAttribute,
+				Tag:             "text",
+				InternalTagName: "raw_text",
 				Order:           0,
 				OnlyRemap:       true,
 			},
@@ -219,13 +294,13 @@ func (s *SongParser) GetTopSongs(amount int) []*Song {
 
 	return nil
 }
-func (s *SongParser) GetSongsWithPage(u string, amount int) ([]*Song, error) {
+func (s *SongParser) GetSongsWithPage(u string, amount int, minRating float32) ([]*Song, error) {
 	var songList []*Song
 	currentURL := u
 	visitedMap := map[string]bool{}
 	for {
 		visitedMap[currentURL] = true
-		sl, err := s.GetSongs(currentURL)
+		sl, err := s.GetSongs(currentURL, minRating)
 		if err != nil {
 			return nil, err
 		}
@@ -248,18 +323,22 @@ func (s *SongParser) GetSongsWithPage(u string, amount int) ([]*Song, error) {
 			return nil, err
 		}
 		if len(p) > 0 {
+			found := false
 			for _, i := range p {
 				if _, found := visitedMap[i.Link]; !found && len(i.Text) > 0 && i.Text != "1" {
 					currentURL = i.Link
+					found = true
 					break
 				}
 			}
-
+			if !found {
+				return nil, err
+			}
 		}
 	}
 
 }
-func (s *SongParser) GetSongs(u string) ([]*Song, error) {
+func (s *SongParser) GetSongs(u string, minRating float32) ([]*Song, error) {
 	b, err := s.Process.GetData(u, s.Data)
 	if err != nil {
 		return nil, err
@@ -269,8 +348,12 @@ func (s *SongParser) GetSongs(u string) ([]*Song, error) {
 	if err != nil {
 		return nil, err
 	}
+	output := []*Song{}
 	for _, s := range songList {
-		s.GetDownloadLink()
+		s.Process()
+		if s.RatingPercent >= minRating {
+			output = append(output, s)
+		}
 	}
-	return songList, nil
+	return output, nil
 }
