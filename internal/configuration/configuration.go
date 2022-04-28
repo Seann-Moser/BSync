@@ -1,47 +1,33 @@
 package configuration
 
 import (
-	"time"
-
-	"github.com/Netflix/go-env"
-	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 type Config struct {
-	Port string `env:"PORT,default=8080"`
+	Logger *zap.Logger
 
-	DBHost     string `env:"DB_HOST,default=mysql"`
-	DBUser     string `env:"DB_USER,default=root"`
-	DBPassword string `env:"DB_PASSWORD,default=root"`
-	DBPort     string `env:"DB_PORT,default=3308"`
+	LoggingLevel string `mapstructure:"logging-level"`
+	LoggingProd  bool   `mapstructure:"logging-prod"`
+	BSaberURL    string `mapstructure:"beat-sync-url"`
+	Workers      int    `mapstructure:"workers"`
 
-	TIMEOUT time.Duration `env:"TIMEOUT,default=30s"`
-	Version string        `env:"VERSION"`
-	Logger  *zap.Logger
-
-	LoggingLevel string `env:"LOGGING_LEVEL,default=DEBUG"`
-	LoggingProd  bool   `env:"LOGGING_PROD,default=true"`
-	Extras       env.EnvSet
-
-	DB        *sqlx.DB
-	RateLimit int `env:"RATE_LIMIT,default=120"`
+	SongDownloadAmount int    `mapstructure:"song-download-amount"`
+	BeatSaberPath      string `mapstructure:"beat-saber-path"`
+	DownloadDelay      int    `mapstructure:"download-delay"`
 }
 
 func LoadConfig() (*Config, error) {
-	var NewConfig Config
-	es, err := env.UnmarshalFromEnviron(&NewConfig)
+	var conf Config
+	err := viper.Unmarshal(&conf)
 	if err != nil {
 		return nil, err
 	}
-	NewConfig.Extras = es
-	NewConfig.Logger, err = ConfigureLogger(&NewConfig)
+	conf.Logger, err = ConfigureLogger(&conf)
 	if err != nil {
 		return nil, err
 	}
-	err = connectToDB(&NewConfig)
-	if err != nil {
-		return nil, err
-	}
-	return &NewConfig, nil
+
+	return &conf, nil
 }
