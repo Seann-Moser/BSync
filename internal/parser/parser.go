@@ -108,15 +108,20 @@ func (s *SongParser) GetSongsWithPage(u string, amount int, minRating float32, p
 	var songList []*Song
 	currentURL := u
 	visitedMap := map[string]bool{}
+	totalCount := 0
 	for {
 		visitedMap[currentURL] = true
-		sl, err := s.GetSongs(currentURL, minRating, path)
+		sl, count, err := s.GetSongs(currentURL, minRating, path)
 		if err != nil {
 			return nil, err
 		}
+		totalCount += count
 
 		songList = append(songList, sl...)
-		if len(songList) > amount && amount != -1 {
+		if (len(songList) > amount || totalCount > amount) && amount != -1 {
+			if amount > len(songList) {
+				return songList, nil
+			}
 			return songList[:amount], nil
 		}
 
@@ -151,15 +156,15 @@ func (s *SongParser) GetSongsWithPage(u string, amount int, minRating float32, p
 	}
 
 }
-func (s *SongParser) GetSongs(u string, minRating float32, path string) ([]*Song, error) {
+func (s *SongParser) GetSongs(u string, minRating float32, path string) ([]*Song, int, error) {
 	b, err := s.Process.GetData(u, s.Data)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	var songList []*Song
 	err = json.Unmarshal(b, &songList)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	output := []*Song{}
 	for _, s := range songList {
@@ -171,7 +176,7 @@ func (s *SongParser) GetSongs(u string, minRating float32, path string) ([]*Song
 	if len(songList)-len(output) > 0 {
 		s.Logger.Info(fmt.Sprintf("filtered out %d songs", len(songList)-len(output)))
 	}
-	return output, nil
+	return output, len(songList), nil
 }
 func (s *SongParser) DownloadSongList(songs []*Song, workers int, path string) {
 	wg := sync.WaitGroup{}
